@@ -53,6 +53,9 @@ class ProductController extends Controller
     public function update()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
+                abort_csrf();
+            }
 
 
             // Xử lý upload ảnh (Tóm tắt)
@@ -63,12 +66,29 @@ class ProductController extends Controller
                 move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $imageName);
             }
 
+            // Basic validation
+            $errors = [];
+            $name = trim($_POST['name'] ?? '');
+            $price = $_POST['price'] ?? null;
+            $category_id = isset($_POST['category_id']) && $_POST['category_id'] !== '' ? (int)$_POST['category_id'] : null;
+
+            if ($name === '') {
+                $errors['name'] = 'Tên sản phẩm không được để trống.';
+            }
+            if ($price === null || !is_numeric($price) || $price < 0) {
+                $errors['price'] = 'Giá không hợp lệ.';
+            }
+
+            if (!empty($errors)) {
+                redirect('/admin/products/create', ['errors' => $errors, 'form' => $_POST]);
+            }
+
             $data = [
                 'id' => $_POST['product_id'], // Lấy ID từ hidden field
-                'name' => $_POST['name'],
-                'price' => $_POST['price'],
+                'name' => $name,
+                'price' => $price,
                 'description' => $_POST['description'],
-                'category_id' => $_POST['category_id'],
+                'category_id' => $category_id,
                 'image' => $imageName // Nếu null, model sẽ bỏ qua cập nhật ảnh
             ];
 
@@ -82,6 +102,9 @@ class ProductController extends Controller
     public function delete()
     {
         if (isset($_POST['product_id'])) {
+            if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
+                abort_csrf();
+            }
             $this->productModel->deleteProduct($_POST['product_id']);
         }
         header('Location: /admin/products/create');
@@ -92,6 +115,9 @@ class ProductController extends Controller
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
+                abort_csrf();
+            }
 
             $imageName = null; // Mặc định là null
 
@@ -117,12 +143,29 @@ class ProductController extends Controller
             }
 
             // --- GOM DỮ LIỆU (Đã thêm category_id) ---
+            // Basic validation
+            $errors = [];
+            $name = trim($_POST['name'] ?? '');
+            $price = $_POST['price'] ?? null;
+            $category_id = isset($_POST['category_id']) && $_POST['category_id'] !== '' ? (int)$_POST['category_id'] : null;
+
+            if ($name === '') {
+                $errors['name'] = 'Tên sản phẩm không được để trống.';
+            }
+            if ($price === null || !is_numeric($price) || $price < 0) {
+                $errors['price'] = 'Giá không hợp lệ.';
+            }
+
+            if (!empty($errors)) {
+                redirect('/admin/products/create', ['errors' => $errors, 'form' => $_POST]);
+            }
+
             $data = [
-                'name'        => $_POST['name'],
-                'price'       => $_POST['price'],
+                'name'        => $name,
+                'price'       => $price,
                 'description' => $_POST['description'],
                 'image'       => $imageName,
-                'category_id' => $_POST['category_id'] ?? null
+                'category_id' => $category_id
             ];
 
             // Gọi Model để lưu

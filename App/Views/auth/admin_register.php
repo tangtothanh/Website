@@ -27,6 +27,7 @@
                     <?php endif; ?>
 
                     <form method="POST" action="/admin/register">
+                        <?= csrf_field() ?>
                         <div class="mb-3">
                             <label for="username" class="form-label">
                                 <i class="fa-solid fa-user me-1"></i>

@@ -72,26 +72,59 @@ class StoreController extends Controller
     public function save()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
+                abort_csrf();
+            }
+            // Basic server-side validation and sanitization
+            $name = trim($_POST['name'] ?? '');
+            $street = trim($_POST['street'] ?? '');
+            $province_name = trim($_POST['province_name'] ?? '');
+            $province_code = trim($_POST['province_code'] ?? '');
+            $district_name = trim($_POST['district_name'] ?? '');
+            $district_code = trim($_POST['district_code'] ?? '');
+            $ward_code = trim($_POST['ward_code'] ?? '');
+            $phone = trim($_POST['phone'] ?? '');
+            $status = isset($_POST['status']) ? ($_POST['status'] == '1' ? 1 : 0) : 0;
+            $open_time = trim($_POST['open_time'] ?? '');
+            $close_time = trim($_POST['close_time'] ?? '');
+
+            $errors = [];
+            if ($name === '') {
+                $errors['name'] = 'Tên cửa hàng không được để trống.';
+            }
+            if ($province_code === '') {
+                $errors['province'] = 'Vui lòng chọn tỉnh/thành.';
+            }
+            if ($street === '') {
+                $errors['street'] = 'Vui lòng nhập số nhà và đường.';
+            }
+            if ($phone === '') {
+                $errors['phone'] = 'Vui lòng nhập số điện thoại.';
+            }
+
+            if (!empty($errors)) {
+                redirect('/admin/stores', ['errors' => $errors, 'form' => $_POST]);
+            }
 
             // Ghép chuỗi địa chỉ đẹp để hiển thị
-            $fullAddress = $_POST['street'] . ', ' .
-                $_POST['ward_name'] . ', ' .
-                $_POST['district_name'] . ', ' .
-                $_POST['province_name'];
+            $fullAddress = $street . ', ' .
+                $ward_code . ', ' .
+                $district_name . ', ' .
+                $province_name;
 
             $data = [
-                'name' => $_POST['name'],
+                'name' => $name,
                 'full_address' => $fullAddress,
-                'province_name' => $_POST['province_name'],
-                'district_name' => $_POST['district_name'],
-                'province_code' => $_POST['province_code'],
-                'district_code' => $_POST['district_code'],
-                'ward_code' => $_POST['ward_code'],
-                'street' => $_POST['street'],
-                'phone' => $_POST['phone'],
-                'status' => $_POST['status'], // Giá trị trả về là '1' hoặc '0'
-                'open_time' => $_POST['open_time'],
-                'close_time' => $_POST['close_time']
+                'province_name' => $province_name,
+                'district_name' => $district_name,
+                'province_code' => $province_code,
+                'district_code' => $district_code,
+                'ward_code' => $ward_code,
+                'street' => $street,
+                'phone' => $phone,
+                'status' => $status,
+                'open_time' => $open_time,
+                'close_time' => $close_time
             ];
 
             // Nếu có ID -> Cập nhật, Không có ID -> Thêm mới
@@ -110,6 +143,9 @@ class StoreController extends Controller
     public function delete()
     {
         if (isset($_POST['store_id'])) {
+            if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
+                abort_csrf();
+            }
             $this->storeModel->deleteStore($_POST['store_id']);
         }
         header('Location: /admin/stores');

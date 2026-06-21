@@ -8,6 +8,7 @@
                 </div>
                 <div class="card-body">
                     <form id="storeForm" action="/admin/stores/save" method="POST">
+                        <?= csrf_field() ?>
                         <input type="hidden" name="store_id" id="store_id">
 
                         <input type="hidden" name="province_name" id="province_name">
@@ -118,6 +119,7 @@
                                         </button>
 
                                         <form action="/admin/stores/delete" method="POST" style="display:inline-block;" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
+                                            <?= csrf_field() ?>
                                             <input type="hidden" name="store_id" value="<?= $store['ch_ma'] ?>">
                                             <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
                                         </form>

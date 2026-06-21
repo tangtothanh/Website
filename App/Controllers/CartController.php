@@ -102,6 +102,9 @@ class CartController extends Controller
         $this->initCart();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
+                abort_csrf();
+            }
             $productId = (int)$_POST['product_id'];
             $quantity = (int)$_POST['quantity'];
 

@@ -46,6 +46,10 @@ class LoginController extends Controller
 
     public function store()
     {
+        if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
+            abort_csrf();
+        }
+
         $user_credentials = $this->filterUserCredentials($_POST);
 
         $errors = [];
@@ -101,6 +105,10 @@ class LoginController extends Controller
      */
     public function authenticate()
     {
+        if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
+            abort_csrf();
+        }
+
         $credentials = $this->filterAdminCredentials($_POST);
 
         $errors = [];
@@ -121,6 +129,10 @@ class LoginController extends Controller
         $this->saveFormValues($_POST, ['password']);
         redirect('/admin/login', ['errors' => $errors]);
     }
+
+        if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
+            abort_csrf();
+        }
 
 
     protected function filterUserCredentials(array $data)

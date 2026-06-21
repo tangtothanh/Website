@@ -77,12 +77,13 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <form method="POST" action="/logout" class="d-inline">
-                                <button type="submit" class="dropdown-item text-danger">
-                                    <i class="fa-solid fa-sign-out-alt me-2"></i>
-                                    Đăng xuất
-                                </button>
-                            </form>
+                                <form method="POST" action="/logout" class="d-inline">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fa-solid fa-sign-out-alt me-2"></i>
+                                        Đăng xuất
+                                    </button>
+                                </form>
                         </li>
                     </ul>
                 </div>
@@ -115,6 +116,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="SHA384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6o+Pz/l69hL+yF5h4D1P4Bf5bM5O6cO9aO" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="SHA384-07I/J9L4F5+lM4/QvM6/5g7S9sH4aE/6j3I2I2G7z8R6K4O7f4B/4N2/H7A/9E" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
 </header>

@@ -10,6 +10,7 @@
                 </div>
                 <div class="card-body p-4">
                     <form method="POST" action="/register">
+                        <?= csrf_field() ?>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">

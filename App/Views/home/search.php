@@ -22,10 +22,16 @@
             <?php foreach ($products as $product): ?>
                 <div class="col-md-3 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <img src="/uploads/<?= htmlspecialchars($product['sp_hinh']) ?>" 
+                        <?php
+                            $imgName = htmlspecialchars($product['sp_hinh']);
+                            $uploadUrl = '/uploads/' . $imgName;
+                            $uploadPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $uploadUrl;
+                            $imgUrl = file_exists($uploadPath) ? $uploadUrl : '/img/unnamed.png';
+                        ?>
+                        <img src="<?= $imgUrl ?>" 
                              class="card-img-top" 
                              alt="<?= htmlspecialchars($product['sp_ten']) ?>"
-                             style="height: 200px; object-fit: cover;">
+                             style="height: 200px; object-fit: cover;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
                         
                         <div class="card-body">
                             <h5 class="card-title"><?= htmlspecialchars($product['sp_ten']) ?></h5>

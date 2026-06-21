@@ -45,14 +45,19 @@
                 <div class="row" id="storeList">
                     <?php foreach ($stores as $store): ?>
                         <?php
-                            $province = $store['ch_thanhpho'] ?? '';
+                            $province = isset($store['ch_thanhpho']) ? (string)$store['ch_thanhpho'] : '';
+                            $name = isset($store['ch_ten']) ? (string)$store['ch_ten'] : '';
+                            $address = isset($store['ch_diachi']) ? (string)$store['ch_diachi'] : '';
+                            $phone = isset($store['ch_sdt']) ? (string)$store['ch_sdt'] : '';
+                            $openTime = isset($store['gio_mo_cua']) ? (string)$store['gio_mo_cua'] : '';
+                            $closeTime = isset($store['gio_dong_cua']) ? (string)$store['gio_dong_cua'] : '';
                             $isActive = ($store['ch_trangthai'] == 1 || $store['ch_trangthai'] === true || $store['ch_trangthai'] === 't');
                         ?>
                         <div class="col-md-6 mb-3 store-card" data-province="<?= htmlspecialchars($province) ?>">
                             <div class="card h-100 shadow-sm">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start">
-                                        <h5 class="card-title mb-1"><?= htmlspecialchars($store['ch_ten']) ?></h5>
+                                        <h5 class="card-title mb-1"><?= htmlspecialchars($name) ?></h5>
                                         <?php if ($isActive): ?>
                                             <span class="badge bg-success">Hoạt động</span>
                                         <?php else: ?>
@@ -61,15 +66,19 @@
                                     </div>
                                     <p class="text-muted mb-1">
                                         <i class="fa fa-map-marker-alt"></i>
-                                        <?= htmlspecialchars($store['ch_diachi']) ?>
+                                        <?= htmlspecialchars($address) ?>
                                     </p>
                                     <p class="mb-1">
                                         <i class="fa fa-phone"></i>
-                                        <?= htmlspecialchars($store['ch_sdt']) ?>
+                                        <?= htmlspecialchars($phone) ?>
                                     </p>
                                     <p class="mb-0">
                                         <i class="fa fa-clock"></i>
-                                        <?= substr($store['gio_mo_cua'], 0, 5) ?> - <?= substr($store['gio_dong_cua'], 0, 5) ?>
+                                        <?php
+                                            $openDisplay = $openTime !== '' ? htmlspecialchars(substr($openTime, 0, 5)) : '-';
+                                            $closeDisplay = $closeTime !== '' ? htmlspecialchars(substr($closeTime, 0, 5)) : '-';
+                                        ?>
+                                        <?= $openDisplay ?> - <?= $closeDisplay ?>
                                     </p>
                                 </div>
                             </div>

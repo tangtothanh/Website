@@ -35,10 +35,16 @@
                                     <?php foreach ($cartItems as $item): ?>
                                         <tr>
                                             <td>
-                                                <img src="/uploads/<?= htmlspecialchars($item['image']) ?>" 
+                                                <?php
+                                                    $imgName = htmlspecialchars($item['image']);
+                                                    $uploadUrl = '/uploads/' . $imgName;
+                                                    $uploadPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $uploadUrl;
+                                                    $imgUrl = file_exists($uploadPath) ? $uploadUrl : '/img/unnamed.png';
+                                                ?>
+                                                <img src="<?= $imgUrl ?>" 
                                                      alt="<?= htmlspecialchars($item['name']) ?>"
                                                      class="img-thumbnail"
-                                                     style="width: 80px; height: 80px; object-fit: cover;">
+                                                     style="width: 80px; height: 80px; object-fit: cover;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
                                             </td>
                                             <td>
                                                 <strong><?= htmlspecialchars($item['name']) ?></strong>
@@ -50,6 +56,7 @@
                                             </td>
                                             <td>
                                                 <form method="POST" action="/cart/update" class="d-inline">
+                                                    <?= csrf_field() ?>
                                                     <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
                                                     <div class="input-group" style="width: 120px;">
                                                         <button type="button" class="btn btn-outline-secondary btn-sm" 
@@ -162,7 +169,7 @@ function decreaseQuantity(productId) {
     }
 }
 
-function updateQuantity(productId, quantity) {
+    function updateQuantity(productId, quantity) {
     if (quantity < 1) {
         quantity = 1;
     }
@@ -180,9 +187,15 @@ function updateQuantity(productId, quantity) {
     quantityInput.type = 'hidden';
     quantityInput.name = 'quantity';
     quantityInput.value = quantity;
+
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = '_csrf';
+    csrfInput.value = (typeof CSRF_TOKEN !== 'undefined') ? CSRF_TOKEN : '';
     
     form.appendChild(productIdInput);
     form.appendChild(quantityInput);
+    form.appendChild(csrfInput);
     document.body.appendChild(form);
     form.submit();
 }

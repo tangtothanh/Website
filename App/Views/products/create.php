@@ -8,6 +8,7 @@
                 </div>
                 <div class="card-body">
                     <form id="productForm" action="/admin/products/store" method="POST" enctype="multipart/form-data">
+                        <?= csrf_field() ?>
                         
                         <input type="hidden" name="product_id" id="product_id">
 
@@ -84,7 +85,13 @@
                             <?php foreach ($products as $p): ?>
                             <tr>
                                 <td>
-                                    <img src="/uploads/<?= htmlspecialchars($p['sp_hinh']) ?>" width="40" height="40" style="object-fit: cover; border-radius: 4px;">
+                                    <?php
+                                        $imgName = htmlspecialchars($p['sp_hinh']);
+                                        $uploadUrl = '/uploads/' . $imgName;
+                                        $uploadPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $uploadUrl;
+                                        $imgUrl = file_exists($uploadPath) ? $uploadUrl : '/img/unnamed.png';
+                                    ?>
+                                    <img src="<?= $imgUrl ?>" width="40" height="40" style="object-fit: cover; border-radius: 4px;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
                                 </td>
                                 <td>
                                     <strong><?= htmlspecialchars($p['sp_ten']) ?></strong>
@@ -97,9 +104,10 @@
                                         <i class="fa fa-edit"></i>
                                     </button>
 
-                                    <form action="/admin/products/delete" method="POST" style="display:inline-block;" 
-                                          onsubmit="return confirm('Bạn chắc chắn sẽ xóa sản phẩm này chứ?');">
-                                        <input type="hidden" name="product_id" value="<?= $p['sp_ma'] ?>">
+                                                                        <form action="/admin/products/delete" method="POST" style="display:inline-block;" 
+                                                                                    onsubmit="return confirm('Bạn chắc chắn sẽ xóa sản phẩm này chứ?');">
+                                                                                <?= csrf_field() ?>
+                                                                                <input type="hidden" name="product_id" value="<?= $p['sp_ma'] ?>">
                                         <button type="submit" class="btn btn-sm btn-danger">
                                             <i class="fa fa-trash"></i>
                                         </button>

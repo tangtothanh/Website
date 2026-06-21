@@ -51,6 +51,10 @@ class AdminRegisterController extends Controller
      */
     public function store()
     {
+        if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
+            abort_csrf();
+        }
+
         $this->saveFormValues($_POST, ['password', 'password_confirmation']);
 
         $data = $this->filterAdminData($_POST);
