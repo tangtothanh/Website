@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style2.css" />
+</head>
+
+<body style="margin:0; padding:0;">
+
+  <!-- Phần header -->
+  <header class="text-center text-light" style="margin:0; padding:0;">
+    <!-- Thanh tìm kiếm -->
+    <div class="d-flex align-items-center justify-content-between px-4 py-2" style="
+            background-color: rgb(206, 255, 225);
+            border-bottom: 1px solid #ccc;  /* chỉ viền dưới, không viền hai bên */
+            width: 100vw;                   /* chiếm toàn màn hình thật */
+            position: relative;
+            left: 0;
+            right: 0;
+            margin: 0;
+            box-sizing: border-box;
+         ">
+
+      <!-- BÊN TRÁI: Logo + thanh tìm kiếm -->
+      <div class="d-flex align-items-center gap-3">
+        <img src="img/logo2.png" alt="Logo Passion" height="70">
+        <div class="input-group" style="width: 300px;">
+          <button class="btn btn-light ">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+          <input type="text" class="form-control" placeholder="Bạn muốn mua gì hôm nay?">
+        </div>
+      </div>
+
+      <!-- BÊN PHẢI: Icon thư + user -->
+      <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-light" title="nhận hàng">
+          <i class="fa-solid fa-motorcycle"></i> Phương thức nhận hàng
+        </button>
+        <button type="button" class="btn btn-success" title="Giỏ hàng">
+          <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng
+        </button>
+        <button type="button" class="btn btn-success" title="Đăng nhập">
+          <i class="fa-solid fa-user"></i> Đăng nhập
+        </button>
+      </div>
+    </div>
+
+    <!-- MENU -->
+    <div style="background-color: #198754; width: 100vw; margin: 0; padding: 0;">
+      <div class="btn-group w-100 justify-content-center" role="group">
+        <button type="button" class="btn btn-success">TRANG CHỦ</button>
+        <button type="button" class="btn btn-success">HOẠT ĐỘNG CSR</button>
+        <div class="btn-group">
+          <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">MENU</button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Cà phê</a></li>
+            <li><a class="dropdown-item" href="#">Trà sữa</a></li>
+            <li><a class="dropdown-item" href="#">Bánh ngọt</a></li>
+          </ul>
+        </div>
+        <button type="button" class="btn btn-success">CỬA HÀNG</button>
+        <button type="button" class="btn btn-success">TIN TỨC & SỰ KIỆN</button>
+        <button type="button" class="btn btn-success">VỀ PASSION</button>
+      </div>
+    </div>
+
+  </header>
+
+  <hr class="container mt-2"/>
+
+    <!-- Phần carousel -->
+  
+  <div
+			id="heroCarousel"
+			class="container carousel slide mb-4"
+			data-bs-ride="carousel"
+		>
+			<div class="carousel-inner">
+				<div class="carousel-item active">
+					<img
+						alt="First slide"
+						src="img/coffee.jpeg"
+						class="d-block w-100"
+					/>
+				</div>
+				<div class="carousel-item">
+					<img
+						alt="Second slide"
+						src="img/pngtree-iced-matcha-green-tea-latte-in-glass-image_15656615.jpg"
+						class="d-block w-100"
+					/>
+				</div>
+				<div class="carousel-item">
+					<img
+						alt="Third slide"
+						src="img/tu-lam-tra-sen-vang-kem-cheese-1-1636205508392223176438.webp"
+						class="d-block w-100"
+					/>
+				</div>
+			</div>
+			<button
+				class="carousel-control-prev"
+				type="button"
+				data-bs-target="#heroCarousel"
+				data-bs-slide="prev"
+			>
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Previous</span>
+			</button>
+			<button
+				class="carousel-control-next"
+				type="button"
+				data-bs-target="#heroCarousel"
+				data-bs-slide="next"
+			>
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Next</span>
+			</button>
+		</div>
+
+  <!--Phần nội dung-->
+  <section class="py-5">
+    <div class="container px-4 px-lg-5 mt-5">
+      <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+        <div class="col mb-5">
+          <div class="card h-100">
+            <!-- Product image-->
+            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+            <!-- Product details-->
+            <div class="card-body p-4">
+              <div class="text-center">
+                <!-- Product name-->
+                <h5 class="fw-bolder">Fancy Product</h5>
+                <!-- Product price-->
+                $40.00 - $80.00
+              </div>
+            </div>
+            <!-- Product actions-->
+            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+              <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">View options</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="col mb-5">
+          <div class="card h-100">
+            <!-- Sale badge-->
+            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
+            <!-- Product image-->
+            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+            <!-- Product details-->
+            <div class="card-body p-4">
+              <div class="text-center">
+                <!-- Product name-->
+                <h5 class="fw-bolder">Special Item</h5>
+                <!-- Product reviews-->
+                <div class="d-flex justify-content-center small text-warning mb-2">
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                </div>
+                <!-- Product price-->
+                <span class="text-muted text-decoration-line-through">$20.00</span>
+                $18.00
+              </div>
+            </div>
+            <!-- Product actions-->
+            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+              <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">Add to cart</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="col mb-5">
+          <div class="card h-100">
+            <!-- Sale badge-->
+            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
+            <!-- Product image-->
+            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+            <!-- Product details-->
+            <div class="card-body p-4">
+              <div class="text-center">
+                <!-- Product name-->
+                <h5 class="fw-bolder">Sale Item</h5>
+                <!-- Product price-->
+                <span class="text-muted text-decoration-line-through">$50.00</span>
+                $25.00
+              </div>
+            </div>
+            <!-- Product actions-->
+            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+              <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">Add to cart</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="col mb-5">
+          <div class="card h-100">
+            <!-- Product image-->
+            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+            <!-- Product details-->
+            <div class="card-body p-4">
+              <div class="text-center">
+                <!-- Product name-->
+                <h5 class="fw-bolder">Popular Item</h5>
+                <!-- Product reviews-->
+                <div class="d-flex justify-content-center small text-warning mb-2">
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                </div>
+                <!-- Product price-->
+                $40.00
+              </div>
+            </div>
+            <!-- Product actions-->
+            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+              <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">Add to cart</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="col mb-5">
+          <div class="card h-100">
+            <!-- Sale badge-->
+            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
+            <!-- Product image-->
+            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+            <!-- Product details-->
+            <div class="card-body p-4">
+              <div class="text-center">
+                <!-- Product name-->
+                <h5 class="fw-bolder">Sale Item</h5>
+                <!-- Product price-->
+                <span class="text-muted text-decoration-line-through">$50.00</span>
+                $25.00
+              </div>
+            </div>
+            <!-- Product actions-->
+            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+              <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">Add to cart</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="col mb-5">
+          <div class="card h-100">
+            <!-- Product image-->
+            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+            <!-- Product details-->
+            <div class="card-body p-4">
+              <div class="text-center">
+                <!-- Product name-->
+                <h5 class="fw-bolder">Fancy Product</h5>
+                <!-- Product price-->
+                $120.00 - $280.00
+              </div>
+            </div>
+            <!-- Product actions-->
+            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+              <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">View options</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="col mb-5">
+          <div class="card h-100">
+            <!-- Sale badge-->
+            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
+            <!-- Product image-->
+            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+            <!-- Product details-->
+            <div class="card-body p-4">
+              <div class="text-center">
+                <!-- Product name-->
+                <h5 class="fw-bolder">Special Item</h5>
+                <!-- Product reviews-->
+                <div class="d-flex justify-content-center small text-warning mb-2">
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                </div>
+                <!-- Product price-->
+                <span class="text-muted text-decoration-line-through">$20.00</span>
+                $18.00
+              </div>
+            </div>
+            <!-- Product actions-->
+            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+              <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">Add to cart</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="col mb-5">
+          <div class="card h-100">
+            <!-- Product image-->
+            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+            <!-- Product details-->
+            <div class="card-body p-4">
+              <div class="text-center">
+                <!-- Product name-->
+                <h5 class="fw-bolder">Popular Item</h5>
+                <!-- Product reviews-->
+                <div class="d-flex justify-content-center small text-warning mb-2">
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                  <div class="bi-star-fill"></div>
+                </div>
+                <!-- Product price-->
+                $40.00
+              </div>
+            </div>
+            <!-- Product actions-->
+            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+              <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">Add to cart</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Phần footer -->
+  <footer class="pt-4 pb-3" style="background-color: #f9f9f9; font-size: 14px;">
+    <div class="container">
+      <div class="row">
+        <!-- Cột 1: Về công ty -->
+        <div class="col-md-3 col-6 mb-3">
+          <h6 class="fw-bold mb-2">Về công ty</h6>
+          <ul class="list-unstyled mb-0">
+            <li><a href="#" class="text-dark text-decoration-none d-block mb-1">Giới thiệu công ty</a></li>
+            <li><a href="#" class="text-dark text-decoration-none d-block mb-1">Tuyển dụng</a></li>
+            <li><a href="#" class="text-dark text-decoration-none d-block mb-1">Gửi góp ý, khiếu nại</a></li>
+            <li><a href="#" class="text-dark text-decoration-none d-block mb-1">Hình ảnh menu</a></li>
+            <li><a href="#" class="text-dark text-decoration-none d-block mb-1">Tuyển dụng</a></li>
+            <li><a href="#" class="text-dark text-decoration-none d-block mb-1">Danh sách cửa hàng</a></li>
+          </ul>
+        </div>
+
+        <!-- Cột 2: Thông tin khác -->
+        <div class="col-md-3 col-6 mb-3">
+          <h6 class="fw-bold mb-2">Hội viên</h6>
+          <ul class="list-unstyled mb-0">
+            <li><a href="#" class="text-dark text-decoration-none d-block mb-1">Tích điểm</a></li>
+            <li><a href="#" class="text-dark text-decoration-none d-block mb-1">Lịch sử mua hàng</a></li>
+            <li><a href="#" class="text-dark text-decoration-none d-block mb-1">Câu hỏi thường gặp</a></li>
+          </ul>
+          <h6 class="fw-bold mb-2">Điều khoản sử dụng</h6>
+          <ul class="list-unstyled mb-0">
+            <li><a href="#" class="text-dark text-decoration-none d-block mb-1">Chính sách bảo mật thông tin</a></li>
+            <li><a href="#" class="text-dark text-decoration-none d-block mb-1">Chính sách đặt hàng</a></li>
+          </ul>
+        </div>
+
+        <!-- Cột 3: Liên hệ -->
+        <div class="col-md-3 col-6 mb-3">
+          <h6 class="fw-bold mb-2">Liên hệ</h6>
+          <p class="mb-1"><i class="fa-solid fa-phone me-2"></i>0901 234 567</p>
+          <p class="mb-1"><i class="fa-solid fa-envelope me-2"></i>support@passion.vn</p>
+          <p class="mb-0"><i class="fa-solid fa-location-dot me-2"></i> P.Ninh Kiều, TP. Cần Thơ</p>
+        </div>
+
+        <!-- Cột 4: Mạng xã hội -->
+        <div class="col-md-3 col-6 mb-3">
+          <h6 class="fw-bold mb-2">Kết nối với chúng tôi</h6>
+          <div class="d-flex gap-3">
+            <a href="#" class="text-dark fs-5"><i class="fa-brands fa-facebook"></i></a>
+            <a href="#" class="text-dark fs-5"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="text-dark fs-5"><i class="fa-brands fa-youtube"></i></a>
+            <a href="#" class="text-dark fs-5"><i class="fa-brands fa-tiktok"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <hr class="my-3">
+      <div class="text-center small text-muted">
+        © 2025 Passion Coffee. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+
+
+
+</body>
+
+
+</html>

@@ -1,0 +1,231 @@
+<?php
+
+namespace App\Models;
+
+use PDO;
+
+class Product
+{
+    protected $pdo;
+
+    public function __construct(PDO $pdo)
+    {
+        $this->pdo = $pdo;
+    }
+
+    // 1. Lấy danh sách sản phẩm mới nhất
+    public function getLatestProducts($limit = 8)
+    {
+        // Sử dụng Prepare Statement để ngăn chặn SQL Injection
+        // Lưu ý: PostgreSQL trả về tên cột thường là chữ thường khi fetchAll
+        $stmt = $this->pdo->prepare("
+            SELECT SP_MA, SP_TEN, SP_GIA, SP_HINH, SP_MOTA 
+            FROM SAN_PHAM 
+            ORDER BY SP_NGAYTAO DESC 
+            LIMIT :limit
+        ");
+
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll();
+    }
+
+    // 2. Lấy danh sách Loại sản phẩm (Để hiển thị trong menu xổ xuống)
+    public function getCategories()
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM LOAI_SAN_PHAM");
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // 3. Thêm sản phẩm mới (Đã cập nhật thêm cột L_MA)
+    public function addProduct($data)
+    {
+        // Câu lệnh SQL chèn dữ liệu, bao gồm cả khóa ngoại L_MA
+        $sql = "INSERT INTO SAN_PHAM (SP_TEN, SP_GIA, SP_MOTA, SP_HINH, L_MA) 
+                VALUES (:ten, :gia, :mota, :hinh, :loai)";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        // Gán dữ liệu vào tham số
+        $stmt->bindValue(':ten', $data['name']);
+        $stmt->bindValue(':gia', $data['price']);
+        $stmt->bindValue(':mota', $data['description']);
+        $stmt->bindValue(':hinh', $data['image']);
+
+        // Xử lý logic: Nếu người dùng không chọn loại (hoặc rỗng) thì lưu là NULL
+        // Lưu ý: Trong Controller ta dùng key là 'category_id'
+        $loai = !empty($data['category_id']) ? $data['category_id'] : null;
+        $stmt->bindValue(':loai', $loai);
+
+        return $stmt->execute();
+    }
+
+    // Thêm vào trong class Product
+
+    // 1. Lấy danh sách sản phẩm (Có lọc theo loại và Phân trang)
+    public function getProductsPaginated($limit, $offset, $categoryId = null)
+    {
+        $sql = "SELECT p.*, l.L_TEN 
+            FROM SAN_PHAM p
+            LEFT JOIN LOAI_SAN_PHAM l ON p.L_MA = l.L_MA";
+
+        // Nếu có lọc theo loại
+        if ($categoryId) {
+            $sql .= " WHERE p.L_MA = :category_id";
+        }
+
+        $sql .= " ORDER BY p.SP_NGAYTAO DESC LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+
+        if ($categoryId) {
+            $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // 2. Đếm tổng số sản phẩm (Để tính số trang)
+    public function countTotal($categoryId = null)
+    {
+        $sql = "SELECT COUNT(*) FROM SAN_PHAM";
+        if ($categoryId) {
+            $sql .= " WHERE L_MA = :category_id";
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        if ($categoryId) {
+            $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        }
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    // 3. Cập nhật sản phẩm
+    public function updateProduct($data)
+    {
+        // Nếu có ảnh mới thì cập nhật cả ảnh, không thì giữ nguyên
+        if (!empty($data['image'])) {
+            $sql = "UPDATE SAN_PHAM SET SP_TEN=:ten, SP_GIA=:gia, SP_MOTA=:mota, SP_HINH=:hinh, L_MA=:loai 
+                WHERE SP_MA=:id";
+        } else {
+            $sql = "UPDATE SAN_PHAM SET SP_TEN=:ten, SP_GIA=:gia, SP_MOTA=:mota, L_MA=:loai 
+                WHERE SP_MA=:id";
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':ten', $data['name']);
+        $stmt->bindValue(':gia', $data['price']);
+        $stmt->bindValue(':mota', $data['description']);
+        $stmt->bindValue(':loai', $data['category_id']);
+        $stmt->bindValue(':id', $data['id']);
+
+        if (!empty($data['image'])) {
+            $stmt->bindValue(':hinh', $data['image']);
+        }
+
+        return $stmt->execute();
+    }
+
+    // 4. Xóa sản phẩm
+    public function deleteProduct($id)
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM SAN_PHAM WHERE SP_MA = :id");
+        $stmt->bindValue(':id', $id);
+        return $stmt->execute();
+    }
+
+    // 5. Lấy sản phẩm theo ID
+    public function getProductById($id)
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT SP_MA, SP_TEN, SP_GIA, SP_HINH, SP_MOTA 
+            FROM SAN_PHAM 
+            WHERE SP_MA = :id
+        ");
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+
+    // 6. Lấy tất cả sản phẩm theo loại (không giới hạn để có thể slider)
+    public function getProductsByCategory($categoryId)
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT SP_MA, SP_TEN, SP_GIA, SP_HINH, SP_MOTA 
+            FROM SAN_PHAM 
+            WHERE L_MA = :category_id
+            ORDER BY SP_NGAYTAO DESC
+        ");
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // 7. Lấy tất cả sản phẩm mới nhất (không giới hạn để có thể slider)
+    public function getAllLatestProducts()
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT SP_MA, SP_TEN, SP_GIA, SP_HINH, SP_MOTA 
+            FROM SAN_PHAM 
+            ORDER BY SP_NGAYTAO DESC
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // 8. Tìm kiếm sản phẩm theo tên
+    public function searchProducts($keyword)
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT SP_MA, SP_TEN, SP_GIA, SP_HINH, SP_MOTA 
+            FROM SAN_PHAM 
+            WHERE SP_TEN ILIKE :keyword
+            ORDER BY SP_NGAYTAO DESC
+        ");
+        $stmt->bindValue(':keyword', '%' . $keyword . '%');
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+    // 9. Lấy sản phẩm theo loại với sắp xếp giá
+    public function getProductsByCategoryWithSort($categoryId, $sortBy = 'default')
+    {
+        $sql = "
+            SELECT SP_MA, SP_TEN, SP_GIA, SP_HINH, SP_MOTA 
+            FROM SAN_PHAM 
+            WHERE L_MA = :category_id
+        ";
+
+        // Xử lý sắp xếp
+        switch ($sortBy) {
+            case 'price_asc':
+                $sql .= " ORDER BY SP_GIA ASC";
+                break;
+            case 'price_desc':
+                $sql .= " ORDER BY SP_GIA DESC";
+                break;
+            default:
+                $sql .= " ORDER BY SP_NGAYTAO DESC";
+                break;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    // 10. Lấy thông tin loại sản phẩm theo ID
+    public function getCategoryById($categoryId)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM LOAI_SAN_PHAM WHERE L_MA = :id");
+        $stmt->bindValue(':id', $categoryId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch();
+    }
+}
