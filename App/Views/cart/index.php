@@ -35,13 +35,7 @@
                                     <?php foreach ($cartItems as $item): ?>
                                         <tr>
                                             <td>
-                                                <?php
-                                                    $imgName = htmlspecialchars($item['image']);
-                                                    $uploadUrl = '/uploads/' . $imgName;
-                                                    $uploadPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $uploadUrl;
-                                                    $imgUrl = file_exists($uploadPath) ? $uploadUrl : '/img/unnamed.png';
-                                                ?>
-                                                <img src="<?= $imgUrl ?>" 
+                                                <img src="<?= product_image_url($item, $item['category_name'] ?? '') ?>" 
                                                      alt="<?= htmlspecialchars($item['name']) ?>"
                                                      class="img-thumbnail"
                                                      style="width: 80px; height: 80px; object-fit: cover;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
@@ -201,9 +195,7 @@ function decreaseQuantity(productId) {
 }
 
 function checkout() {
-    alert('Tính năng thanh toán đang được phát triển. Vui lòng quay lại sau!');
-    // Có thể redirect đến trang thanh toán sau này
-    // window.location.href = '/checkout';
+    window.location.href = '/checkout';
 }
 </script>
 

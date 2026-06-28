@@ -62,13 +62,13 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a class="dropdown-item" href="/account">
                                 <i class="fa-solid fa-user-circle me-2"></i>
                                 Thông tin tài khoản
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="#">
+                            <a class="dropdown-item" href="/account/orders">
                                 <i class="fa-solid fa-receipt me-2"></i>
                                 Đơn hàng của tôi
                             </a>
@@ -111,6 +111,7 @@
             </div>
 
             <a href="/cua-hang" class="btn btn-success">CỬA HÀNG</a>
+            <a href="/khuyen-mai" class="btn btn-success">KHUYẾN MÃI</a>
             <a href="/ve-passion" class="btn btn-success">VỀ PASSION</a>
             <a href="/lien-he" class="btn btn-success">LIÊN HỆ</a>
         </div>

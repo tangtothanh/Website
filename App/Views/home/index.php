@@ -55,25 +55,30 @@ function renderProductRow($title, $products, $rowId) {
                 <?php foreach ($displayProducts as $product): ?>
                     <div class="col-md-3 mb-4">
                         <div class="card h-100 shadow-sm">
-                            <?php
-                                $imgName = htmlspecialchars($product['sp_hinh']);
-                                $uploadUrl = '/uploads/' . $imgName;
-                                $uploadPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $uploadUrl;
-                                $imgUrl = file_exists($uploadPath) ? $uploadUrl : '/img/unnamed.png';
-                            ?>
-                            <img src="<?= $imgUrl ?>" 
-                                 class="card-img-top" 
-                                 alt="<?= htmlspecialchars($product['sp_ten']) ?>"
-                                 style="height: 200px; object-fit: cover;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
-                            
-                            <div class="card-body">
-                                <h5 class="card-title"><?= htmlspecialchars($product['sp_ten']) ?></h5>
-                                
-                                <p class="card-text text-danger font-weight-bold">
-                                    <?= number_format($product['sp_gia'], 0, ',', '.') ?> VNĐ
-                                </p>
-                                
-                                <a href="/cart/add?id=<?= $product['sp_ma'] ?>&redirect=<?= urlencode($redirectUrl) ?>" 
+                            <a href="/san-pham/<?= $product['sp_ma'] ?>" class="text-decoration-none text-dark position-relative">
+                                <?php if (!empty($product['km_phantram'])): ?>
+                                    <span class="badge bg-danger position-absolute top-0 end-0 m-2">-<?= $product['km_phantram'] ?>%</span>
+                                <?php endif; ?>
+                                <img src="<?= product_image_url($product, $category['l_ten'] ?? '') ?>"
+                                     class="card-img-top"
+                                     alt="<?= htmlspecialchars($product['sp_ten']) ?>"
+                                     style="height: 200px; object-fit: cover;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
+
+                                <div class="card-body pb-0">
+                                    <h5 class="card-title"><?= htmlspecialchars($product['sp_ten']) ?></h5>
+
+                                    <p class="card-text text-danger font-weight-bold mb-0">
+                                        <?php if (!empty($product['km_phantram'])): ?>
+                                            <span class="text-muted text-decoration-line-through small"><?= number_format($product['sp_gia'], 0, ',', '.') ?> VNĐ</span>
+                                            <br>
+                                        <?php endif; ?>
+                                        <?= number_format($product['gia_hien_thi'], 0, ',', '.') ?> VNĐ
+                                    </p>
+                                </div>
+                            </a>
+
+                            <div class="card-body pt-2">
+                                <a href="/cart/add?id=<?= $product['sp_ma'] ?>&redirect=<?= urlencode($redirectUrl) ?>"
                                    class="btn btn-success w-100">
                                     <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
                                 </a>
@@ -165,14 +170,20 @@ function renderProductRow($title, $products, $rowId) {
 
   // Dữ liệu cho dòng sản phẩm mới nhất
   <?php if (count($latestProducts) > 4): ?>
-    productData['latest'] = <?= json_encode($latestProducts) ?>;
+    productData['latest'] = <?= json_encode(array_map(function ($product) {
+        $product['image_url'] = product_image_url($product, $product['l_ten'] ?? '');
+        return $product;
+    }, $latestProducts)) ?>;
     currentIndex['latest'] = 0;
   <?php endif; ?>
 
   // Dữ liệu cho các dòng sản phẩm theo loại
   <?php foreach ($categoryProducts as $categoryData): ?>
     <?php if (count($categoryData['products']) > 4): ?>
-      productData['category-<?= $categoryData['category']['l_ma'] ?>'] = <?= json_encode($categoryData['products']) ?>;
+      productData['category-<?= $categoryData['category']['l_ma'] ?>'] = <?= json_encode(array_map(function ($product) use ($categoryData) {
+          $product['image_url'] = product_image_url($product, $categoryData['category']['l_ten'] ?? '');
+          return $product;
+      }, $categoryData['products'])) ?>;
       currentIndex['category-<?= $categoryData['category']['l_ma'] ?>'] = 0;
     <?php endif; ?>
   <?php endforeach; ?>
@@ -200,17 +211,31 @@ function renderProductRow($title, $products, $rowId) {
     displayProducts.forEach(product => {
       const col = document.createElement('div');
       col.className = 'col-md-3 mb-4';
+      const discountBadge = product.km_phantram
+        ? `<span class="badge bg-danger position-absolute top-0 end-0 m-2">-${product.km_phantram}%</span>`
+        : '';
+      const oldPriceLine = product.km_phantram
+        ? `<span class="text-muted text-decoration-line-through small">${parseInt(product.sp_gia).toLocaleString('vi-VN')} VNĐ</span><br>`
+        : '';
+      const displayPrice = product.km_phantram ? product.gia_hien_thi : product.sp_gia;
+
       col.innerHTML = `
             <div class="card h-100 shadow-sm">
-                <img src="/uploads/${product.sp_hinh}" 
-                     class="card-img-top" 
-                     alt="${product.sp_ten}"
-                     style="height: 200px; object-fit: cover;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
-                <div class="card-body">
-                    <h5 class="card-title">${product.sp_ten}</h5>
-                    <p class="card-text text-danger font-weight-bold">
-                        ${parseInt(product.sp_gia).toLocaleString('vi-VN')} VNĐ
-                    </p>
+                <a href="/san-pham/${product.sp_ma}" class="text-decoration-none text-dark position-relative">
+                    ${discountBadge}
+                    <img src="${product.image_url || '/img/unnamed.png'}"
+                         class="card-img-top"
+                         alt="${product.sp_ten}"
+                         style="height: 200px; object-fit: cover;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
+                    <div class="card-body pb-0">
+                        <h5 class="card-title">${product.sp_ten}</h5>
+                        <p class="card-text text-danger font-weight-bold mb-0">
+                            ${oldPriceLine}
+                            ${parseInt(displayPrice).toLocaleString('vi-VN')} VNĐ
+                        </p>
+                    </div>
+                </a>
+                <div class="card-body pt-2">
                     <a href="/cart/add?id=${product.sp_ma}&redirect=/" class="btn btn-success w-100">
                         <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
                     </a>

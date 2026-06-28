@@ -4,11 +4,13 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\Product;
+use App\Models\Promotion;
 use App\Models\PDOFactory;
 
 class HomeController extends Controller
 {
     protected $productModel;
+    protected $promotionModel;
 
     public function __construct()
     {
@@ -27,6 +29,7 @@ class HomeController extends Controller
 
         // 3. Khởi tạo Model với kết nối vừa tạo
         $this->productModel = new Product($pdo);
+        $this->promotionModel = new Promotion($pdo);
     }
 
     public function index()
@@ -112,5 +115,21 @@ class HomeController extends Controller
     public function contact()
     {
         $this->view('home/contact');
+    }
+
+    // Trang công khai: danh sách khuyến mãi đang áp dụng
+    public function promotions()
+    {
+        $promotions = $this->promotionModel->getActive();
+
+        $promotionsWithProducts = array_map(function ($promotion) {
+            $promotion['products'] = $this->promotionModel->getProductsForPromotion($promotion['km_ma']);
+            return $promotion;
+        }, $promotions);
+
+        $this->view('home/promotions', [
+            'title' => 'Khuyến mãi - ' . APPNAME,
+            'promotions' => $promotionsWithProducts
+        ]);
     }
 }

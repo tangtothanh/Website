@@ -90,3 +90,166 @@ if (!function_exists('abort_csrf')) {
         exit;
     }
 }
+
+if (!function_exists('normalize_text')) {
+    function normalize_text(string $text): string
+    {
+        $text = mb_strtolower(trim($text), 'UTF-8');
+        if (function_exists('transliterator_transliterate')) {
+            $text = transliterator_transliterate('Any-Latin; Latin-ASCII;', $text);
+        } else {
+            $text = @iconv('UTF-8', 'ASCII//TRANSLIT', $text) ?: $text;
+        }
+        $text = preg_replace('/[^a-z0-9 ]+/i', ' ', $text);
+        $text = preg_replace('/\s+/', ' ', $text);
+        return trim($text);
+    }
+}
+
+if (!function_exists('get_image_map')) {
+    function get_image_map(string $publicPath): array
+    {
+        $map = [];
+        $imgRoot = $publicPath . DIRECTORY_SEPARATOR . 'img';
+        if (!is_dir($imgRoot)) {
+            return $map;
+        }
+
+        $folders = array_filter(scandir($imgRoot), function ($d) use ($imgRoot) {
+            return $d !== '.' && $d !== '..' && is_dir($imgRoot . DIRECTORY_SEPARATOR . $d);
+        });
+
+        foreach ($folders as $folder) {
+            $folderPath = $imgRoot . DIRECTORY_SEPARATOR . $folder;
+            $files = array_values(array_filter(scandir($folderPath), function ($f) use ($folderPath) {
+                return $f !== '.' && $f !== '..' && is_file($folderPath . DIRECTORY_SEPARATOR . $f);
+            }));
+
+            foreach ($files as $file) {
+                $key = normalize_text(pathinfo($file, PATHINFO_FILENAME));
+                // store mapping: normalized filename -> actual filename
+                $map[$folder][$key] = $file;
+            }
+        }
+
+        return $map;
+    }
+}
+
+if (!function_exists('product_image_url')) {
+    function product_image_url(array $product, string $categoryName = ''): string
+    {
+        $publicPath = realpath(__DIR__ . '/../public');
+        if (!$publicPath) {
+            return '/img/unnamed.png';
+        }
+
+        // Prefer uploads if present
+        $imageName = trim($product['sp_hinh'] ?? $product['image'] ?? '');
+        if ($imageName !== '') {
+            $uploadPath = $publicPath . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $imageName;
+            if (file_exists($uploadPath)) {
+                return '/uploads/' . rawurlencode($imageName);
+            }
+        }
+
+        $categoryName = normalize_text($categoryName ?: ($product['l_ten'] ?? ''));
+        $productName = normalize_text($product['sp_ten'] ?? $product['name'] ?? '');
+
+        // prefer a static config map if present
+        $mapFile = dirname(__DIR__) . '/config/image_map.php';
+        if (file_exists($mapFile)) {
+            try {
+                $configMap = include $mapFile;
+                if (is_array($configMap)) {
+                    $productKey = normalize_text($productName);
+                    $categoryKey = normalize_text($categoryName);
+
+                    if ($productKey !== '' && isset($configMap[$productKey])) {
+                        return $configMap[$productKey];
+                    }
+
+                    foreach ($configMap as $key => $path) {
+                        $mapKey = normalize_text($key);
+                        if ($mapKey === '') {
+                            continue;
+                        }
+                        if ($productKey !== '' && strpos($productKey, $mapKey) !== false) {
+                            return $path;
+                        }
+                        if ($productKey !== '' && strpos($mapKey, $productKey) !== false) {
+                            return $path;
+                        }
+                        if ($categoryKey !== '' && strpos($categoryKey, $mapKey) !== false) {
+                            return $path;
+                        }
+                        if ($categoryKey !== '' && strpos($mapKey, $categoryKey) !== false) {
+                            return $path;
+                        }
+                    }
+                }
+            } catch (Throwable $e) {
+                // ignore invalid map
+            }
+        }
+
+        // determine candidate folder from category or product name
+        $categoryFolders = [
+            'tra sua' => ['tra sua', 'hong tra', 'matcha', 'nhan sen', 'socola', 'o long'],
+            'ca phe' => ['ca phe', 'cafe', 'coffee', 'cappuccino', 'capuccino', 'latte', 'espresso', 'den', 'da', 'ca phe sua', 'kem'],
+            'banh' => ['banh', 'banh chuoi', 'chuoi', 'banh flan', 'tiramisu', 'panna cotta', 'croissant', 'sung bo'],
+            'tra trai cay' => ['tra cam', 'tra trai cay', 'fruit tea', 'tra hoa qua', 'tra xanh', 'tra cam que']
+        ];
+
+        $folder = null;
+        foreach ($categoryFolders as $dir => $keywords) {
+            foreach ($keywords as $keyword) {
+                $k = normalize_text($keyword);
+                if ($k !== '' && (strpos($categoryName, $k) !== false || strpos($productName, $k) !== false)) {
+                    $folder = $dir;
+                    break 2;
+                }
+            }
+        }
+
+        $imgRoot = $publicPath . DIRECTORY_SEPARATOR . 'img';
+        if ($folder === null) {
+            $available = array_filter(scandir($imgRoot), function ($d) use ($imgRoot) {
+                return $d !== '.' && $d !== '..' && is_dir($imgRoot . DIRECTORY_SEPARATOR . $d);
+            });
+            foreach ($available as $d) {
+                $dn = normalize_text($d);
+                if ($dn !== '' && strpos($productName, $dn) !== false) {
+                    $folder = $d;
+                    break;
+                }
+            }
+        }
+
+        if ($folder === null) {
+            $folder = 'banh';
+        }
+
+        $map = get_image_map($publicPath);
+        if (!empty($map[$folder])) {
+            foreach ($map[$folder] as $key => $file) {
+                if ($key === '') {
+                    continue;
+                }
+                if ($productName !== '' && strpos($productName, $key) !== false) {
+                    return '/img/' . implode('/', array_map('rawurlencode', [$folder, $file]));
+                }
+                if ($folder === 'banh' && strpos($key, $productName) !== false) {
+                    return '/img/' . implode('/', array_map('rawurlencode', [$folder, $file]));
+                }
+            }
+
+            if (!empty($map[$folder])) {
+                $firstFile = reset($map[$folder]);
+                return '/img/' . implode('/', array_map('rawurlencode', [$folder, $firstFile]));
+            }
+        }
+
+        return '/img/unnamed.png';
+    }
+}

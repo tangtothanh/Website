@@ -70,6 +70,16 @@ class Store
         return $stmt->fetchAll();
     }
 
+    // 7. Lấy danh sách quận/huyện đang được phục vụ (để kiểm tra khu vực giao hàng)
+    public function getActiveDistricts()
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT DISTINCT CH_QUANHUYEN FROM CUA_HANG WHERE CH_TRANGTHAI = true AND CH_QUANHUYEN IS NOT NULL ORDER BY CH_QUANHUYEN ASC"
+        );
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
     // Hàm phụ trợ để gán tham số cho gọn
     private function bindParams($stmt, $data)
     {

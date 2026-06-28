@@ -4,11 +4,13 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\Product;
+use App\Models\Promotion;
 use App\Models\PDOFactory;
 
 class ProductController extends Controller
 {
     protected $productModel;
+    protected $promotionModel;
 
     public function __construct()
     {
@@ -22,7 +24,60 @@ class ProductController extends Controller
         ];
         $pdo = (new PDOFactory())->create($config);
         $this->productModel = new Product($pdo);
+        $this->promotionModel = new Promotion($pdo);
         $this->setLayout('layouts/admin_master');
+    }
+
+    /**
+     * Trang frontend: danh sách tất cả sản phẩm (có lọc theo loại + phân trang)
+     */
+    public function index()
+    {
+        $this->setLayout('layouts/master');
+
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $categoryId = isset($_GET['filter_category']) ? (int)$_GET['filter_category'] : null;
+        $limit = 12;
+        $offset = ($page - 1) * $limit;
+
+        $categories = $this->productModel->getCategories();
+        $products = $this->productModel->getProductsPaginated($limit, $offset, $categoryId);
+        $totalProducts = $this->productModel->countTotal($categoryId);
+        $totalPages = ceil($totalProducts / $limit);
+
+        $this->view('products/index', [
+            'title' => 'Sản phẩm - ' . APPNAME,
+            'categories' => $categories,
+            'products' => $products,
+            'totalPages' => $totalPages,
+            'currentPage' => $page,
+            'currentCategory' => $categoryId
+        ]);
+    }
+
+    /**
+     * Trang frontend: chi tiết một sản phẩm
+     */
+    public function show($id)
+    {
+        $this->setLayout('layouts/master');
+
+        $product = $this->productModel->getProductById((int)$id);
+
+        if (!$product) {
+            header('Location: /san-pham');
+            exit;
+        }
+
+        $relatedProducts = !empty($product['l_ma'])
+            ? $this->productModel->getRelatedProducts($product['l_ma'], $product['sp_ma'])
+            : [];
+
+        $this->view('products/show', [
+            'title' => $product['sp_ten'] . ' - ' . APPNAME,
+            'product' => $product,
+            'relatedProducts' => $relatedProducts
+        ]);
     }
 
     // Sửa hàm create cũ
@@ -43,6 +98,7 @@ class ProductController extends Controller
         // 3. Truyền hết sang View
         $this->view('products/create', [
             'categories' => $categories,
+            'promotions' => $this->promotionModel->getActive(),
             'products' => $products,
             'totalPages' => $totalPages,
             'currentPage' => $page,
@@ -83,12 +139,15 @@ class ProductController extends Controller
                 redirect('/admin/products/create', ['errors' => $errors, 'form' => $_POST]);
             }
 
+            $promotion_id = isset($_POST['promotion_id']) && $_POST['promotion_id'] !== '' ? (int)$_POST['promotion_id'] : null;
+
             $data = [
                 'id' => $_POST['product_id'], // Lấy ID từ hidden field
                 'name' => $name,
                 'price' => $price,
                 'description' => $_POST['description'],
                 'category_id' => $category_id,
+                'promotion_id' => $promotion_id,
                 'image' => $imageName // Nếu null, model sẽ bỏ qua cập nhật ảnh
             ];
 
@@ -160,12 +219,15 @@ class ProductController extends Controller
                 redirect('/admin/products/create', ['errors' => $errors, 'form' => $_POST]);
             }
 
+            $promotion_id = isset($_POST['promotion_id']) && $_POST['promotion_id'] !== '' ? (int)$_POST['promotion_id'] : null;
+
             $data = [
                 'name'        => $name,
                 'price'       => $price,
                 'description' => $_POST['description'],
                 'image'       => $imageName,
-                'category_id' => $category_id
+                'category_id' => $category_id,
+                'promotion_id' => $promotion_id
             ];
 
             // Gọi Model để lưu

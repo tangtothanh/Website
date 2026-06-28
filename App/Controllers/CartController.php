@@ -62,7 +62,7 @@ class CartController extends Controller
             $_SESSION['cart'][$productId] = [
                 'id' => $product['sp_ma'],
                 'name' => $product['sp_ten'],
-                'price' => $product['sp_gia'],
+                'price' => $product['gia_hien_thi'],
                 'image' => $product['sp_hinh'],
                 'quantity' => $quantity
             ];
@@ -184,7 +184,7 @@ class CartController extends Controller
             $_SESSION['cart'][$productId] = [
                 'id'       => $product['sp_ma'],
                 'name'     => $product['sp_ten'],
-                'price'    => $product['sp_gia'],
+                'price'    => $product['gia_hien_thi'],
                 'image'    => $product['sp_hinh'],
                 'quantity' => $quantity,
             ];

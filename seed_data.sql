@@ -37,16 +37,27 @@ BEGIN
 
     IF NOT EXISTS (SELECT 1 FROM KHACH_HANG WHERE KH_EMAIL = 'a@example.com') THEN
         INSERT INTO KHACH_HANG (KH_TEN, KH_EMAIL, KH_SDT, KH_DIACHI, KH_MATKHAU) VALUES
-        ('Nguyễn Văn A', 'a@example.com', '0900000001', 'Hồ Chí Minh', 'password');
+        ('Nguyễn Văn A', 'a@example.com', '0900000001', 'Hồ Chí Minh', crypt('password', gen_salt('bf')));
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM KHACH_HANG WHERE KH_EMAIL = 'b@example.com') THEN
         INSERT INTO KHACH_HANG (KH_TEN, KH_EMAIL, KH_SDT, KH_DIACHI, KH_MATKHAU) VALUES
-        ('Trần Thị B', 'b@example.com', '0900000002', 'Hà Nội', 'password');
+        ('Trần Thị B', 'b@example.com', '0900000002', 'Hà Nội', crypt('password', gen_salt('bf')));
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM QUAN_TRI_VIEN WHERE QTV_TENDN = 'admin') THEN
-        INSERT INTO QUAN_TRI_VIEN (QTV_TENDN, QTV_MATKHAU) VALUES ('admin', 'adminpass');
+        INSERT INTO QUAN_TRI_VIEN (QTV_TENDN, QTV_MATKHAU) VALUES ('admin', crypt('adminpass', gen_salt('bf')));
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM KHUYEN_MAI WHERE KM_TEN = 'Mùa lễ hội giảm giá') THEN
+        INSERT INTO KHUYEN_MAI (KM_TEN, KM_MOTA, KM_PHANTRAM, KM_NGAYBATDAU, KM_NGAYKETTHUC, KM_TRANGTHAI) VALUES
+        ('Mùa lễ hội giảm giá', 'Áp dụng cho một số sản phẩm chọn lọc', 20, CURRENT_DATE - INTERVAL '7 day', CURRENT_DATE + INTERVAL '30 day', true);
+    END IF;
+
+    IF EXISTS (SELECT 1 FROM KHUYEN_MAI WHERE KM_TEN = 'Mùa lễ hội giảm giá')
+       AND EXISTS (SELECT 1 FROM SAN_PHAM WHERE SP_TEN = 'Cà Phê Đen' AND KM_MA IS NULL) THEN
+        UPDATE SAN_PHAM SET KM_MA = (SELECT KM_MA FROM KHUYEN_MAI WHERE KM_TEN = 'Mùa lễ hội giảm giá' LIMIT 1)
+        WHERE SP_TEN = 'Cà Phê Đen';
     END IF;
 END$$;
 

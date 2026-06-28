@@ -3,11 +3,13 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Models\Order;
 use App\Models\PDOFactory;
 
 class AdminController extends Controller
 {
     protected $pdo;
+    protected $orderModel;
 
     public function __construct()
     {
@@ -25,7 +27,8 @@ class AdminController extends Controller
             'db_pass' => $_ENV['DB_PASS'] ?? 'password',
         ];
         $this->pdo = (new PDOFactory())->create($config);
-        
+        $this->orderModel = new Order($this->pdo);
+
         $this->setLayout('layouts/admin_master');
     }
 
@@ -56,12 +59,19 @@ class AdminController extends Controller
      */
     public function orders()
     {
-        // TODO: Lấy danh sách đơn hàng từ database
-        $orders = [];
-        
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+
+        $orders = $this->orderModel->getAllPaginated($limit, $offset);
+        $totalOrders = $this->orderModel->countTotal();
+
         $data = [
             'title' => 'Quản Lý Đơn Hàng - ' . APPNAME,
             'orders' => $orders,
+            'totalPages' => ceil($totalOrders / $limit),
+            'currentPage' => $page,
+            'messages' => session_get_once('messages'),
         ];
 
         $this->view('admin/orders', $data);
@@ -73,17 +83,21 @@ class AdminController extends Controller
     public function orderDetail()
     {
         $orderId = $_GET['id'] ?? null;
-        
+
         if (!$orderId) {
             redirect('/admin/orders');
         }
 
-        // TODO: Lấy chi tiết đơn hàng từ database
-        $order = null;
-        
+        $order = $this->orderModel->findById((int)$orderId);
+
+        if (!$order) {
+            redirect('/admin/orders');
+        }
+
         $data = [
             'title' => 'Chi Tiết Đơn Hàng - ' . APPNAME,
             'order' => $order,
+            'items' => $this->orderModel->getItemsByOrderId((int)$orderId),
         ];
 
         $this->view('admin/order_detail', $data);
@@ -94,6 +108,10 @@ class AdminController extends Controller
      */
     public function updateOrderStatus()
     {
+        if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
+            abort_csrf();
+        }
+
         $orderId = $_POST['order_id'] ?? null;
         $status = $_POST['status'] ?? null;
 
@@ -101,8 +119,8 @@ class AdminController extends Controller
             redirect('/admin/orders', ['errors' => ['Thiếu thông tin cần thiết.']]);
         }
 
-        // TODO: Cập nhật trạng thái đơn hàng trong database
-        
+        $this->orderModel->updateStatus((int)$orderId, $status);
+
         redirect('/admin/orders', ['messages' => ['success' => 'Cập nhật trạng thái đơn hàng thành công!']]);
     }
 
@@ -111,17 +129,9 @@ class AdminController extends Controller
      */
     public function statistics()
     {
-        // TODO: Lấy dữ liệu thống kê từ database
-        $stats = [
-            'total_orders' => 0,
-            'total_revenue' => 0,
-            'total_products' => 0,
-            'total_customers' => 0,
-        ];
-        
         $data = [
             'title' => 'Thống Kê - ' . APPNAME,
-            'stats' => $stats,
+            'stats' => $this->orderModel->getStatistics(),
         ];
 
         $this->view('admin/statistics', $data);

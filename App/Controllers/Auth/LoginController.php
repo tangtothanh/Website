@@ -130,11 +130,6 @@ class LoginController extends Controller
         redirect('/admin/login', ['errors' => $errors]);
     }
 
-        if (!validate_csrf_token($_POST['_csrf'] ?? '')) {
-            abort_csrf();
-        }
-
-
     protected function filterUserCredentials(array $data)
     {
         return [

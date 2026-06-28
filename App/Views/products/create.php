@@ -26,7 +26,19 @@
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        
+
+                        <div class="mb-3">
+                            <label class="form-label">Khuyến mãi áp dụng</label>
+                            <select class="form-select" id="promotion_id" name="promotion_id">
+                                <option value="">-- Không áp dụng --</option>
+                                <?php foreach ($promotions as $promotion): ?>
+                                    <option value="<?= $promotion['km_ma'] ?>">
+                                        <?= htmlspecialchars($promotion['km_ten']) ?> (-<?= $promotion['km_phantram'] ?>%)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">Giá bán</label>
                             <input type="number" class="form-control" id="price" name="price" required min="0">
@@ -85,13 +97,7 @@
                             <?php foreach ($products as $p): ?>
                             <tr>
                                 <td>
-                                    <?php
-                                        $imgName = htmlspecialchars($p['sp_hinh']);
-                                        $uploadUrl = '/uploads/' . $imgName;
-                                        $uploadPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $uploadUrl;
-                                        $imgUrl = file_exists($uploadPath) ? $uploadUrl : '/img/unnamed.png';
-                                    ?>
-                                    <img src="<?= $imgUrl ?>" width="40" height="40" style="object-fit: cover; border-radius: 4px;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
+                                    <img src="<?= product_image_url($p, $p['l_ten'] ?? '') ?>" width="40" height="40" style="object-fit: cover; border-radius: 4px;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
                                 </td>
                                 <td>
                                     <strong><?= htmlspecialchars($p['sp_ten']) ?></strong>
@@ -145,6 +151,7 @@
         document.getElementById('price').value = product.sp_gia;
         document.getElementById('description').value = product.sp_mota;
         document.getElementById('category_id').value = product.l_ma;
+        document.getElementById('promotion_id').value = product.km_ma ?? '';
 
         // 2. Thay đổi trạng thái Form thành "Cập nhật"
         document.getElementById('formTitle').innerText = 'Cập nhật món: ' + product.sp_ten;

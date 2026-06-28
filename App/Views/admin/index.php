@@ -75,6 +75,21 @@
                 </div>
             </div>
         </div>
+
+        <!-- Card Quản Lý Khuyến Mãi -->
+        <div class="col-md-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fa-solid fa-tags fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Quản Lý Khuyến Mãi</h5>
+                    <p class="card-text text-muted">Tạo và quản lý chương trình khuyến mãi</p>
+                    <a href="/admin/promotions" class="btn btn-success">
+                        <i class="fa-solid fa-arrow-right me-1"></i>
+                        Xem chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row mt-5">

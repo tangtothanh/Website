@@ -23,6 +23,11 @@ $router->post('/register', '\\App\Controllers\Auth\RegisterController@store');
 $router->get('/login', '\App\Controllers\Auth\LoginController@create');
 $router->post('/login', '\App\Controllers\Auth\LoginController@store');
 
+// Thông tin tài khoản
+$router->get('/account', '\App\Controllers\AccountController@show');
+$router->post('/account', '\App\Controllers\AccountController@update');
+$router->get('/account/orders', '\App\Controllers\AccountController@orders');
+
 
 // Trang chủ
 $router->get('/', '\App\Controllers\HomeController@index');
@@ -56,7 +61,9 @@ $router->get('/cart/clear', '\App\Controllers\CartController@clear');
 $router->get('/cart/count', '\App\Controllers\CartController@count');
 
 // Đơn hàng
+$router->get('/checkout', '\App\Controllers\OrderController@checkout');
 $router->post('/dat-hang', '\App\Controllers\OrderController@store');
+$router->get('/dat-hang/thanh-cong', '\App\Controllers\OrderController@success');
 
 // Admin đăng nhập
 $router->get('/admin/login', '\App\Controllers\Auth\LoginController@index');
@@ -87,4 +94,12 @@ $router->post('/admin/products/delete', '\App\Controllers\ProductController@dele
 $router->get('/admin/stores', '\App\Controllers\StoreController@index');
 $router->post('/admin/stores/save', '\App\Controllers\StoreController@save'); // Dùng chung cho Thêm & Sửa
 $router->post('/admin/stores/delete', '\App\Controllers\StoreController@delete');
+
+// Quản lý khuyến mãi
+$router->get('/admin/promotions', '\App\Controllers\PromotionController@index');
+$router->post('/admin/promotions/save', '\App\Controllers\PromotionController@save');
+$router->post('/admin/promotions/delete', '\App\Controllers\PromotionController@delete');
+
+// Khuyến mãi (trang công khai)
+$router->get('/khuyen-mai', '\App\Controllers\HomeController@promotions');
 $router->run();

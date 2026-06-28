@@ -22,26 +22,31 @@
             <?php foreach ($products as $product): ?>
                 <div class="col-md-3 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <?php
-                            $imgName = htmlspecialchars($product['sp_hinh']);
-                            $uploadUrl = '/uploads/' . $imgName;
-                            $uploadPath = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . $uploadUrl;
-                            $imgUrl = file_exists($uploadPath) ? $uploadUrl : '/img/unnamed.png';
-                        ?>
-                        <img src="<?= $imgUrl ?>" 
-                             class="card-img-top" 
-                             alt="<?= htmlspecialchars($product['sp_ten']) ?>"
-                             style="height: 200px; object-fit: cover;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
-                        
-                        <div class="card-body">
-                            <h5 class="card-title"><?= htmlspecialchars($product['sp_ten']) ?></h5>
-                            
-                            <p class="card-text text-danger font-weight-bold">
-                                <?= number_format($product['sp_gia'], 0, ',', '.') ?> VNĐ
-                            </p>
-                            
-                            <a href="#" 
-                               class="btn btn-success w-100 add-to-cart-btn" 
+                        <a href="/san-pham/<?= $product['sp_ma'] ?>" class="text-decoration-none text-dark position-relative">
+                            <?php if (!empty($product['km_phantram'])): ?>
+                                <span class="badge bg-danger position-absolute top-0 end-0 m-2">-<?= $product['km_phantram'] ?>%</span>
+                            <?php endif; ?>
+                            <img src="<?= product_image_url($product, $product['l_ten'] ?? '') ?>"
+                                 class="card-img-top"
+                                 alt="<?= htmlspecialchars($product['sp_ten']) ?>"
+                                 style="height: 200px; object-fit: cover;" onerror="this.onerror=null;this.src='/img/unnamed.png';">
+
+                            <div class="card-body pb-0">
+                                <h5 class="card-title"><?= htmlspecialchars($product['sp_ten']) ?></h5>
+
+                                <p class="card-text text-danger font-weight-bold mb-0">
+                                    <?php if (!empty($product['km_phantram'])): ?>
+                                        <span class="text-muted text-decoration-line-through small"><?= number_format($product['sp_gia'], 0, ',', '.') ?> VNĐ</span>
+                                        <br>
+                                    <?php endif; ?>
+                                    <?= number_format($product['gia_hien_thi'], 0, ',', '.') ?> VNĐ
+                                </p>
+                            </div>
+                        </a>
+
+                        <div class="card-body pt-2">
+                            <a href="#"
+                               class="btn btn-success w-100 add-to-cart-btn"
                                data-product-id="<?= $product['sp_ma'] ?>"
                                data-product-name="<?= htmlspecialchars($product['sp_ten']) ?>">
                                 <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
